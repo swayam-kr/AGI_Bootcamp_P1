@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from data_manager import DataManager
 from groq_client import groq_service
 
-app = FastAPI(title="AI Restaurant Discovery API v2")
+app = FastAPI(title="AI Restaurant Discovery API v2", root_path="/api")
 
 # Enable CORS for frontend connection
 app.add_middleware(
