@@ -101,10 +101,11 @@ export default function Home() {
             V2: Advanced LLM Recommendation
           </div>
           <h1 className="text-6xl md:text-7xl font-black tracking-tight leading-none">
-            Find Your <span className="bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">Flavour.</span>
+            Savoury <span className="bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">AI.</span>
           </h1>
           <p className="text-slate-400 text-lg md:text-xl max-w-xl mx-auto font-medium">
-            Search across 51,000+ restaurants. Ranked by data, curated by AI.
+            Discover the perfect dining experience across 51,000+ restaurants.
+            Ranked by data, curated by intelligence.
           </p>
         </motion.div>
 
