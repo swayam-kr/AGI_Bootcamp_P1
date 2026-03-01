@@ -35,13 +35,26 @@ class RecommendationResponse(BaseModel):
     candidates: List[dict]
     ai_rationale: str
 
+# Initialize shared services
+dm = DataManager()
+
+def ensure_data():
+    if dm.df is None:
+        dm.load_data()
+        dm.clean_data()
+
 @app.get("/")
 def home():
     return {"message": "AI Restaurant Recommendation API v2 - Ready"}
 
 @app.get("/metadata")
 def get_metadata():
-    """Returns unique areas and cuisines for the frontend dropdowns."""
+    """Returns unique areas and cuisines for the frontend dropdowns. Loads data on demand."""
+    ensure_data()
+    if dm.df is None:
+        # Fallback if the first load fails or is slow
+        return {"areas": ["Bangalore", "HSR", "Koramangala"], "cuisines": ["North Indian", "South Indian", "Chinese"]}
+    
     areas = sorted(dm.df['area_clean'].unique().tolist())
     all_cuisines = set()
     for c_str in dm.df['cuisines_clean'].dropna():
@@ -58,6 +71,7 @@ def get_recommendation(prefs: UserPreferences):
     """
     Filters restaurants and uses Groq to rank and recommend.
     """
+    ensure_data()
     candidates = dm.search_restaurants(
         area=prefs.area, 
         min_cost=prefs.min_cost,
@@ -89,6 +103,7 @@ def get_recommendation(prefs: UserPreferences):
 @app.get("/restaurant/{name}/details")
 def get_restaurant_details(name: str):
     """Fetches AI pros/cons and deep analysis for a single restaurant."""
+    ensure_data()
     rest = dm.get_restaurant_by_name(name)
     if not rest:
         raise HTTPException(status_code=404, detail="Restaurant not found")

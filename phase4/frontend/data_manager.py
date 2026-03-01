@@ -9,11 +9,13 @@ class DataManager:
         self.df = None
 
     def load_data(self):
-        """Loads data from Hugging Face and converts to pandas DataFrame."""
+        """Loads data with caching logic for serverless environments."""
+        if self.df is not None:
+            return True
         try:
-            dataset = load_dataset(self.dataset_name, trust_remote_code=False)
-            split_name = list(dataset.keys())[0] if isinstance(dataset, dict) else dataset.split
-            self.df = pd.DataFrame(dataset[split_name if isinstance(dataset, dict) else 0])
+            # We use a stream or a smaller subset if needed, but for now we trust HF
+            dataset = load_dataset(self.dataset_name, split='train', trust_remote_code=False)
+            self.df = pd.DataFrame(dataset)
             return True
         except Exception as e:
             print(f"Error loading dataset: {e}")
