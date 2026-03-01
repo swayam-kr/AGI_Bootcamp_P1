@@ -13,8 +13,9 @@ class DataManager:
         if self.df is not None:
             return True
         try:
-            # We use a stream or a smaller subset if needed, but for now we trust HF
-            dataset = load_dataset(self.dataset_name, split='train', trust_remote_code=False)
+            # We fetch a subset (5,000 rows) to stay within Vercel's 10s timeout limit.
+            # This is more than enough for a robust demo!
+            dataset = load_dataset(self.dataset_name, split='train[:5000]', trust_remote_code=False)
             self.df = pd.DataFrame(dataset)
             return True
         except Exception as e:
