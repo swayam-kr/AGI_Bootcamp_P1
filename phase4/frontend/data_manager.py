@@ -9,17 +9,26 @@ class DataManager:
         self.df = None
 
     def load_data(self):
-        """Loads data with caching logic for serverless environments."""
+        """Loads data with caching logic for serverless environments. Prefer local CSV."""
         if self.df is not None:
             return True
+        
+        # 1. Try Local CSV first (Best for Vercel/Production stability)
+        local_path = os.path.join(os.path.dirname(__file__), "restaurants_subset.csv")
+        if os.path.exists(local_path):
+            try:
+                self.df = pd.read_csv(local_path)
+                return True
+            except Exception as e:
+                print(f"Error loading local CSV: {e}")
+
+        # 2. Fallback to Hugging Face (Try small slice to avoid timeout)
         try:
-            # We fetch a subset (5,000 rows) to stay within Vercel's 10s timeout limit.
-            # This is more than enough for a robust demo!
-            dataset = load_dataset(self.dataset_name, split='train[:5000]', trust_remote_code=False)
+            dataset = load_dataset(self.dataset_name, split='train[:1000]', trust_remote_code=False)
             self.df = pd.DataFrame(dataset)
             return True
         except Exception as e:
-            print(f"Error loading dataset: {e}")
+            print(f"Error loading from HF: {e}")
             return False
 
     def clean_data(self):
